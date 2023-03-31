@@ -17,11 +17,22 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
-    - name: Install .NET Framework Developer Pack
+    - name: Download .NET Framework Developer Pack
+      shell: powershell
       run: |
-        Invoke-WebRequest -Uri 'https://download.microsoft.com/download/3/0/3/3039c581-d84c-4c1c-85a2-ff00322bd0a0/NDP461-DevPack-KB3151934-ENU.exe' -OutFile NDP461-DevPack-KB3151934-ENU.exe
-        .\NDP461-DevPack-KB3151934-ENU.exe /quiet /norestart
-        Remove-Item NDP461-DevPack-KB3151934-ENU.exe
+        $url = "https://download.microsoft.com/download/3/0/3/3039c581-d84c-4c1c-85a2-ff00322bd0a0/NDP461-DevPack-KB3151934-ENU.exe"
+        Invoke-WebRequest $url -OutFile NDP461-DevPack-KB3151934-ENU.exe
+
+    - name: Install .NET Framework Developer Pack
+      shell: powershell
+      run: |
+        $arguments = @(
+          '/q', '/norestart',
+          'ADDLOCAL=ALL',
+          'IACCEPTLICENSETERMS=YES',
+          'REBOOT=ReallySuppress'
+        )
+        Start-Process -FilePath .\NDP461-DevPack-KB3151934-ENU.exe -ArgumentList $arguments -Wait
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
