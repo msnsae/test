@@ -20,7 +20,7 @@ jobs:
     - name: Download .NET Framework Developer Pack
       shell: powershell
       run: |
-        $url = "https://download.microsoft.com/download/3/0/3/3039c581-d84c-4c1c-85a2-ff00322bd0a0/NDP461-DevPack-KB3151934-ENU.exe"
+        $url = "https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe"
         Invoke-WebRequest $url -OutFile NDP461-DevPack-KB3151934-ENU.exe
 
     - name: Install .NET Framework Developer Pack
