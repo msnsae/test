@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: WIN-5BOE1UBVPD5
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v3
