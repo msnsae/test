@@ -1,41 +1,35 @@
-name: .NET
+name: Publish .NET Project to Remote Server
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
-
+  publish:
     runs-on: self-hosted
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
-    - name: Download .NET Framework Developer Pack
-      shell: powershell
-      run: |
-        $url = "https://download.microsoft.com/download/E/4/1/E4173890-A24A-4936-9FC9-AF930FE3FA40/NDP461-KB3102436-x86-x64-AllOS-ENU.exe"
-        Invoke-WebRequest $url -OutFile NDP461-DevPack-KB3151934-ENU.exe
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Install .NET Framework Developer Pack
-      shell: powershell
-      run: |
-        $arguments = @(
-          '/q', '/norestart',
-          'ADDLOCAL=ALL',
-          'IACCEPTLICENSETERMS=YES',
-          'REBOOT=ReallySuppress'
-        )
-        Start-Process -FilePath .\NDP461-DevPack-KB3151934-ENU.exe -ArgumentList $arguments -Wait
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '7.0.x'
+
+    - name: Publish
+      run: dotnet publish -c Release --no-self-contained -o ./publish
+
+    - name: Copy to remote server
+      uses: appleboy/ssh-action@v0.19.0
+      with:
+        host: ${{ secrets.203.215.171.93 }}
+        username: ${{ secrets.Administrator }}
+        password: ${{ secrets.Helloitsbspo1! }}
+        port: ${{ secrets.3389 }}
+        script: |
+          New-Item -ItemType Directory -Force -Path "C:\inetpub\wwwroot\myapp"
+          Copy-Item -Path "./publish/*" -Destination "C:\inetpub\wwwroot\myapp" -Recurse
+
+    - name: Remove publish folder
+      run: rm -rf ./publish
